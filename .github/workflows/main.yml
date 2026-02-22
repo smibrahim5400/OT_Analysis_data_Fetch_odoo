@@ -20,7 +20,7 @@ on:
         description: 'End date (YYYY-MM-DD) [ignored, always yesterday]'
         required: false
         default: ''
-  schedule:
+  # schedule:
     # - cron: '0 */4 * * *'
 
 jobs:
