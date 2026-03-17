@@ -47,8 +47,16 @@ jobs:
           pip install gspread oauth2client gspread_dataframe pytz requests
 
       - name: Decode Google Service Account
+        env:
+          GOOGLE_CREDS_JSON: ${{ secrets.GOOGLE_CREDS_JSON }}
         run: |
-          echo "$GOOGLE_CREDS_B64" | base64 --decode > gcreds.json
+          if echo "$GOOGLE_CREDS_JSON" | python3 -c "import sys,json; json.load(sys.stdin)" 2>/dev/null; then
+            echo "$GOOGLE_CREDS_JSON" > gcreds.json
+            echo "Using raw JSON credentials."
+          else
+            echo "$GOOGLE_CREDS_B64" | base64 --decode > gcreds.json
+            echo "Using base64-decoded credentials."
+          fi
 
       - name: Determine script to run and dates
         id: script
