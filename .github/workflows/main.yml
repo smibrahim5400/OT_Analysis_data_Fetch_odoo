@@ -83,11 +83,11 @@ jobs:
             echo "RUN_ALL=false" >> $GITHUB_ENV
           fi
 
-      - name: Run OT Data Fetch
-        if: env.SCRIPT == 'Ot_data_fetch.py' || env.RUN_ALL == 'true'
-        run: |
-          echo "Running OT Data Fetch from $FROM_DATE to $TO_DATE"
-          python Ot_data_fetch.py --from_date $FROM_DATE --to_date $TO_DATE
+      # - name: Run OT Data Fetch
+      #   if: env.SCRIPT == 'Ot_data_fetch.py' || env.RUN_ALL == 'true'
+      #   run: |
+      #     echo "Running OT Data Fetch from $FROM_DATE to $TO_DATE"
+      #     python Ot_data_fetch.py --from_date $FROM_DATE --to_date $TO_DATE
 
       - name: Run Purchase Orders Fetch
         if: env.SCRIPT == 'purchase_orders.py' || env.RUN_ALL == 'true'
