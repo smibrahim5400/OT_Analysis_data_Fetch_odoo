@@ -170,19 +170,25 @@ scope = ["https://www.googleapis.com/auth/spreadsheets",
 creds = service_account.Credentials.from_service_account_file('gcreds.json', scopes=scope)
 client = gspread.authorize(creds)
 
-sheet = client.open_by_key("19FTCzNt8cWhy9CXFXM0NmIotlrkiKhIVMtH6MfFNOEM")
-worksheet = sheet.worksheet("PO_Status_Data")
+SHEET_KEYS = [
+    "19FTCzNt8cWhy9CXFXM0NmIotlrkiKhIVMtH6MfFNOEM",
+    "1G5fcewmAMYF7sW6CEr6r8FTBMS1NgcFFT2gtXO8Z2Xg",
+]
+WORKSHEET_NAME = "PO_Status_Data"
+
+local_tz = pytz.timezone('Asia/Dhaka')
+local_time = datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S")
 
 if df.empty:
     log.info("Skip: DataFrame is empty, not pasting to sheet.")
 else:
-    worksheet.clear()
-    time.sleep(2)
-    set_with_dataframe(worksheet, df)
-    log.info("✅ Data pasted to Google Sheet (PO_Status_Data).")
-
-    # Add timestamp
-    local_tz = pytz.timezone('Asia/Dhaka')
-    local_time = datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S")
-    worksheet.update("AC1", [[f"{local_time}"]])
-    log.info(f"✅ Timestamp updated: {local_time}")
+    for key in SHEET_KEYS:
+        sheet = client.open_by_key(key)
+        worksheet = sheet.worksheet(WORKSHEET_NAME)
+        worksheet.clear()
+        time.sleep(2)
+        set_with_dataframe(worksheet, df)
+        if worksheet.col_count < 29:
+            worksheet.resize(rows=worksheet.row_count, cols=29)
+        worksheet.update(range_name="AC1", values=[[local_time]])
+        log.info(f"✅ Data pasted and timestamp updated in sheet: {key}")
